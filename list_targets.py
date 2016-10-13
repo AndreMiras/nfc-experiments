@@ -11,23 +11,17 @@ from pn532_reader import Pn532Reader
 
 def run(pn532_reader):
     COMMAND_STR = "D4 32 01 00"
-    pn532_reader.send_apdu_str(COMMAND_STR)
-
-    COMMAND_STR = "FF C0 00 00 04"
-    pn532_reader.transmit_str(COMMAND_STR)
+    response_str = pn532_reader.send_apdu_str(COMMAND_STR)
+    print("response_str: %s" % response_str)
 
     COMMAND_STR = "D4 32 01 01"
-    pn532_reader.send_apdu_str(COMMAND_STR)
-
-    COMMAND_STR = "FF C0 00 00 04"
-    pn532_reader.transmit_str(COMMAND_STR)
+    response_str = pn532_reader.send_apdu_str(COMMAND_STR)
+    print("response_str: %s" % response_str)
 
     # 4A InListPassivTargets
     COMMAND_STR = "D4 4A 01 00"
-    pn532_reader.send_apdu_str(COMMAND_STR)
-
-    COMMAND_STR = "FF C0 00 00 0E"
-    pn532_reader.transmit_str(COMMAND_STR)
+    response_str = pn532_reader.send_apdu_str(COMMAND_STR)
+    print("response_str: %s" % response_str)
 
 
 def main():
