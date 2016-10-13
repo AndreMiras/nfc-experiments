@@ -6,24 +6,7 @@ PN532 Command (InListPassiveTarget 212Kbps) = "D4 4A 01 01"
 from __future__ import print_function
 from __future__ import unicode_literals
 from smartcard.System import readers
-
-
-class Pn532Reader(object):
-
-    def __init__(self, pcsc_reader):
-        self.connection = pcsc_reader.createConnection()
-        self.connection.connect()
-
-    def transmit(self, command):
-        command_str = " ".join(["%02X" % x for x in command])
-        print("> %s" % command_str)
-        data, sw1, sw2 = self.connection.transmit(command)
-        data_str = " ".join(["%02X" % x for x in data])
-        print("< [%s] %02X %02X" % (data_str, sw1, sw2))
-
-    def transmit_str(self, command_str):
-        command = [int(x, 16) for x in command_str.split()]
-        self.transmit(command)
+from pn532_reader import Pn532Reader
 
 
 def run(pn532_reader):
