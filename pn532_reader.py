@@ -150,7 +150,7 @@ class Pn532Reader(object):
             raise Pn532ReaderNoResponseDataError('')
         raise Pn532ReaderUnknownError('')
 
-    def transmit(self, command):
+    def _transmit(self, command):
         """
         Args:
             command (list of int): the raw APDU to be sent.
@@ -162,14 +162,14 @@ class Pn532Reader(object):
         print("< [%s] %02X %02X" % (data_str, sw1, sw2))
         return data, sw1, sw2
 
-    def direct_transmit(self, command):
+    def _direct_transmit(self, command):
         """
         Sends a pseudo APDU command, handles the response status code
         and returns the response length.
         Args:
             command (list of int): the raw APDU to be sent.
         """
-        data, sw1, sw2 = self.transmit(command)
+        data, sw1, sw2 = self._transmit(command)
         self._handle_dt_status_code(sw1, sw2)
         # The operation is completed successfully.
         # The response data has a length of LEN bytes.
@@ -177,7 +177,7 @@ class Pn532Reader(object):
         response_length = sw2
         return response_length
 
-    def get_response(self, response_length):
+    def _get_response(self, response_length):
         """
         Sends the "0xFF 0xC0 0x00 0x00 Le" command to get the response.
         Args:
@@ -191,20 +191,20 @@ class Pn532Reader(object):
         ]
         pseudo_apdu_get_response = PSEUDO_APDU_GET_RESPONSE_PREFIX
         pseudo_apdu_get_response += [response_length]
-        data, sw1, _ = self.transmit(pseudo_apdu_get_response)
+        data, sw1, _ = self._transmit(pseudo_apdu_get_response)
         # Data Out: Response Data, or Error Code "63 00" will be given
         # if no response data is available.
         self._handle_gr_status_code(sw1)
         return data
 
-    def transmit_retrieve(self, command):
+    def _transmit_retrieve(self, command):
         """
         Transmits the pseudo APDU command, then sends a new pseud APDU
         command to retrieve the response.
         Table 2.0A: Get Response Command Format (5 Bytes).
         """
-        response_length = self.direct_transmit(command)
-        response = self.get_response(response_length)
+        response_length = self._direct_transmit(command)
+        response = self._get_response(response_length)
         return response
 
     def send_apdu(self, payload):
@@ -222,7 +222,7 @@ class Pn532Reader(object):
             Pn532Reader.DIRECT_TRANSMIT_P2)
         pseudo_apdu.set_payload(payload)
         raw_apdu = pseudo_apdu.get_raw()
-        response = self.transmit_retrieve(raw_apdu)
+        response = self._transmit_retrieve(raw_apdu)
         return response
 
     def send_apdu_str(self, payload_str):
