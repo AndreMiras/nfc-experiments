@@ -10,32 +10,21 @@ from pn532_reader import Pn532Reader
 
 
 def run(pn532_reader):
-    DIRECT_TRANSMIT_CLASS = 0xFF
-    DIRECT_TRANSMIT_INS = 0x00
-    DIRECT_TRANSMIT_P1 = 0x00
-    DIRECT_TRANSMIT_P2 = 0x00
-    DIRECT_TRANSMIT_COMMAND_PREFIX = "%s %s %s %s" % (
-        DIRECT_TRANSMIT_CLASS,
-        DIRECT_TRANSMIT_INS,
-        DIRECT_TRANSMIT_P1,
-        DIRECT_TRANSMIT_P2,
-    )
-
-    COMMAND_STR = "%s 04 D4 32 01 00" % (DIRECT_TRANSMIT_COMMAND_PREFIX)
-    pn532_reader.transmit_str(COMMAND_STR)
+    COMMAND_STR = "D4 32 01 00"
+    pn532_reader.send_apdu_str(COMMAND_STR)
 
     COMMAND_STR = "FF C0 00 00 04"
     pn532_reader.transmit_str(COMMAND_STR)
 
-    COMMAND_STR = "%s 04 D4 32 01 01" % (DIRECT_TRANSMIT_COMMAND_PREFIX)
-    pn532_reader.transmit_str(COMMAND_STR)
+    COMMAND_STR = "D4 32 01 01"
+    pn532_reader.send_apdu_str(COMMAND_STR)
 
     COMMAND_STR = "FF C0 00 00 04"
     pn532_reader.transmit_str(COMMAND_STR)
 
     # 4A InListPassivTargets
-    COMMAND_STR = "%s 04 D4 4A 01 00" % (DIRECT_TRANSMIT_COMMAND_PREFIX)
-    pn532_reader.transmit_str(COMMAND_STR)
+    COMMAND_STR = "D4 4A 01 00"
+    pn532_reader.send_apdu_str(COMMAND_STR)
 
     COMMAND_STR = "FF C0 00 00 0E"
     pn532_reader.transmit_str(COMMAND_STR)
