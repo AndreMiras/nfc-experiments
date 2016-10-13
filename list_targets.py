@@ -31,6 +31,7 @@ def main():
     reader = pcsc_readers[0]
     print("Using reader: %s" % reader)
     pn532_reader = Pn532Reader(reader)
+    pn532_reader._debug = True
     run(pn532_reader)
 
 if __name__ == "__main__":

@@ -120,6 +120,7 @@ class Pn532Reader(object):
     def __init__(self, pcsc_reader):
         self.connection = pcsc_reader.createConnection()
         self.connection.connect()
+        self._debug = False
 
     def _handle_dt_status_code(self, sw1, sw2):
         """
@@ -156,10 +157,12 @@ class Pn532Reader(object):
             command (list of int): the raw APDU to be sent.
         """
         command_str = " ".join(["%02X" % x for x in command])
-        print("> %s" % command_str)
+        if self._debug:
+            print("> %s" % command_str)
         data, sw1, sw2 = self.connection.transmit(command)
         data_str = " ".join(["%02X" % x for x in data])
-        print("< [%s] %02X %02X" % (data_str, sw1, sw2))
+        if self._debug:
+            print("< [%s] %02X %02X" % (data_str, sw1, sw2))
         return data, sw1, sw2
 
     def _direct_transmit(self, command):
