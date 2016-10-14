@@ -2,12 +2,14 @@
 """
 Implements the PN532 reader:
 http://www.proxmark.org/files/Documents/NFC/ACS_API_ACR122.pdf
+http://www.nxp.com/documents/application_note/AN133910.pdf
 
 InListPassivTargets (0x4A) command example.
 PN532 Command (InListPassiveTarget 212Kbps) = "D4 4A 01 01"
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+from enum import Enum
 
 
 class Pn532ReaderUnknownError(Exception):
@@ -38,17 +40,63 @@ class Pn532ReaderChecksumError(Exception):
     pass
 
 
+
 class Pn532ReaderParameterError(Exception):
     """
     The PN532_Contactless Command is wrong.
     """
     pass
 
+
 class Pn532ReaderNoResponseDataError(Exception):
     """
     No response data is available.
     """
     pass
+
+
+class Pn532Modulation(Enum):
+    """
+    NFC modulation enumeration.
+    """
+    # ISO14443-A (NXP MIFARE) http://en.wikipedia.org/wiki/MIFARE
+    PM_ISO14443A_106 = 0x00
+    # JIS X 6319-4 (Sony Felica) http://en.wikipedia.org/wiki/FeliCa
+    PM_FELICA_212 = 0x01
+    # JIS X 6319-4 (Sony Felica) http://en.wikipedia.org/wiki/FeliCa
+    PM_FELICA_424 = 0x02
+    # ISO14443-B http://en.wikipedia.org/wiki/ISO/IEC_14443
+    # (Not supported by PN531)
+    PM_ISO14443B_106 = 0x03
+    # Jewel Topaz (Innovision Research & Development)
+    # (Not supported by PN531)
+    PM_JEWEL_106 = 0x04
+    # ISO14443-B http://en.wikipedia.org/wiki/ISO/IEC_14443
+    # (Not supported by PN531 nor PN532)
+    PM_ISO14443B_212 = 0x06
+    # ISO14443-B http://en.wikipedia.org/wiki/ISO/IEC_14443
+    # (Not supported by PN531 nor PN532)
+    PM_ISO14443B_424 = 0x07
+    # ISO14443-B http://en.wikipedia.org/wiki/ISO/IEC_14443
+    # (Not supported by PN531 nor PN532)
+    PM_ISO14443B_847 = 0x08
+
+
+class NfcModulation(Enum):
+    """
+    NFC modulation type enumeration.
+    """
+    NMT_ISO14443A = 1
+    NMT_JEWEL = 2
+    NMT_ISO14443B = 3
+    # pre-ISO14443B aka ISO/IEC 14443 B' or Type B'
+    NMT_ISO14443BI = 4
+    # ISO14443-2B ST SRx
+    NMT_ISO14443B2SR = 5
+    # ISO14443-2B ASK CTx
+    NMT_ISO14443B2CT = 6
+    NMT_FELICA = 7
+    NMT_DEP = 8
 
 
 class PseudoApdu(object):
