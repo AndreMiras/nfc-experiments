@@ -10,10 +10,6 @@ from pn532_reader import Pn532Reader, Pn532Modulation, NfcModulation
 
 
 def decode_target_data_iso14443a(target_data):
-    response_header = target_data[0:2]
-    response_header_str = "%02X %02X" % (
-        response_header[0], response_header[1])
-    tags_found = target_data[2]
     target_number = target_data[3]
     sens_res = target_data[4:6]
     sens_res_str = "%02X %02X" % (
@@ -22,8 +18,6 @@ def decode_target_data_iso14443a(target_data):
     uid_length = target_data[7]
     uid = target_data[8:8+uid_length]
     uid_str = " ".join(["%02X" % x for x in uid])
-    print("response_header:", response_header_str)
-    print("tags_found:", tags_found)
     print("target_number:", target_number)
     print("sens_res:", sens_res_str)
     print("sel_res:", sel_res)
@@ -32,10 +26,6 @@ def decode_target_data_iso14443a(target_data):
 
 
 def decode_target_data_iso14443b(target_data):
-    response_header = target_data[0:2]
-    response_header_str = "%02X %02X" % (
-        response_header[0], response_header[1])
-    tags_found = target_data[2]
     target_number = target_data[3]
     # Store the PUPI (Pseudo-Unique PICC Identifier)
     pupi = target_data[5:9]
@@ -54,15 +44,26 @@ def decode_target_data_iso14443b(target_data):
       pnti->nbi.ui8CardIdentifier = *(pbtRawData++);
     }
     """
-    print("response_header:", response_header_str)
-    print("tags_found:", tags_found)
     print("target_number:", target_number)
     print("pupi:", pupi_str)
     print("application_data:", application_data_str)
     print("protocole_info:", protocole_info_str)
 
 
+def decode_target_data_header(target_data):
+    response_header = target_data[0:2]
+    response_header_str = "%02X %02X" % (
+        response_header[0], response_header[1])
+    tags_found = target_data[2]
+    print("response_header:", response_header_str)
+    print("tags_found:", tags_found)
+    return tags_found
+
+
 def decode_target_data(target_data, nfc_modulation):
+    tags_found = decode_target_data_header(target_data)
+    if tags_found < 1:
+        return
     if nfc_modulation == NfcModulation.NMT_ISO14443A:
         decode_target_data_iso14443a(target_data)
     elif nfc_modulation == NfcModulation.NMT_ISO14443B:
@@ -80,11 +81,14 @@ def pn_to_nfc_modulation(pn532_modulation):
 
 
 def run(pn532_reader):
+    # Turns on the antenna power
     # 0x32 RFConfiguration
-    # Turn on the antenna power
     command_str = "32 01 01"
     response_str = pn532_reader.send_apdu_str(command_str)
-    # print("response_str: %s" % response_str)
+    # Sets the Retry Time to one
+    # 0x32 RFConfiguration
+    command_str = "32 05 00 00 00"
+    response_str = pn532_reader.send_apdu_str(command_str)
 
     pn532_modulation = Pn532Modulation.PM_ISO14443A_106.value
     # pn532_modulation = Pn532Modulation.PM_ISO14443B_106.value
@@ -100,11 +104,10 @@ def run(pn532_reader):
     print("response: %s" % response_str)
     nfc_modulation = pn_to_nfc_modulation(pn532_modulation)
     decode_target_data(response, nfc_modulation)
+    # Turns off the antenna power
     # 0x32 RFConfiguration
-    # Turn off the antenna power
     command_str = "32 01 00"
     response_str = pn532_reader.send_apdu_str(command_str)
-    # print("response_str: %s" % response_str)
 
 
 def main():
