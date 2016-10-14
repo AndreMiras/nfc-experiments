@@ -32,7 +32,34 @@ def decode_target_data_iso14443a(target_data):
 
 
 def decode_target_data_iso14443b(target_data):
-    raise NotImplemented('')
+    response_header = target_data[0:2]
+    response_header_str = "%02X %02X" % (
+        response_header[0], response_header[1])
+    tags_found = target_data[2]
+    target_number = target_data[3]
+    # Store the PUPI (Pseudo-Unique PICC Identifier)
+    pupi = target_data[5:9]
+    pupi_str = " ".join(["%02X" % x for x in pupi])
+    # Store the Application Data
+    application_data = target_data[9:13]
+    application_data_str = " ".join(["%02X" % x for x in application_data])
+    # Store the Protocol Info
+    protocole_info = target_data[13:16]
+    protocole_info_str = " ".join(["%02X" % x for x in protocole_info])
+    # TODO: handle the Card IDentifier just like the pn53x.c
+    """
+    // We leave the ATQB field, we now enter in Card IDentifier
+    szAttribRes = *(pbtRawData++);
+    if (szAttribRes) {
+      pnti->nbi.ui8CardIdentifier = *(pbtRawData++);
+    }
+    """
+    print("response_header:", response_header_str)
+    print("tags_found:", tags_found)
+    print("target_number:", target_number)
+    print("pupi:", pupi_str)
+    print("application_data:", application_data_str)
+    print("protocole_info:", protocole_info_str)
 
 
 def decode_target_data(target_data, nfc_modulation):
