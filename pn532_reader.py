@@ -40,7 +40,6 @@ class Pn532ReaderChecksumError(Exception):
     pass
 
 
-
 class Pn532ReaderParameterError(Exception):
     """
     The PN532_Contactless Command is wrong.
@@ -268,7 +267,6 @@ class Pn532Reader(object):
         """
         # prepends the host -> reader direction byte
         payload = [Pn532Reader.DIRECTION_HOST_READER] + payload
-        direct_transmit_lc = len(payload)
         # adds the pseudo ADPU header
         pseudo_apdu = PseudoApdu()
         pseudo_apdu.set_headers(
@@ -300,7 +298,7 @@ def main():
     reader = pcsc_readers[0]
     print("Using reader: %s" % reader)
     pn532_reader = Pn532Reader(reader)
+    print("pn532_reader:", pn532_reader)
 
 if __name__ == "__main__":
     main()
-
