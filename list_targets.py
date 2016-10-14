@@ -44,6 +44,14 @@ def decode_target_data(target_data, nfc_modulation):
         raise NotImplemented('')
 
 
+def pn_to_nfc_modulation(pn532_modulation):
+    if pn532_modulation == Pn532Modulation.PM_ISO14443A_106.value:
+        return NfcModulation.NMT_ISO14443A
+    elif pn532_modulation == Pn532Modulation.PM_ISO14443B_106.value:
+        return NfcModulation.NMT_ISO14443B
+    raise NotImplemented('')
+
+
 def run(pn532_reader):
     # 0x32 RFConfiguration
     # Turn on the antenna power
@@ -51,13 +59,20 @@ def run(pn532_reader):
     response_str = pn532_reader.send_apdu_str(command_str)
     # print("response_str: %s" % response_str)
 
+    pn532_modulation = Pn532Modulation.PM_ISO14443A_106.value
+    # pn532_modulation = Pn532Modulation.PM_ISO14443B_106.value
     # 0x4A InListPassivTargets
-    command_str = "4A 01 %02X" % (Pn532Modulation.PM_ISO14443A_106.value)
+    command_str = "4A 01 %02X" % (pn532_modulation)
     # command_str = "4A 01 %02X 00" % (Pn532Modulation.PM_ISO14443B_106.value)
+    if pn532_modulation == Pn532Modulation.PM_ISO14443B_106.value:
+        # optional initiator data (used for Felica, ISO14443B,
+        # Topaz Polling or for ISO14443A selecting a specific UID)
+        command_str += " 00"
     response_str = pn532_reader.send_apdu_str(command_str)
     response = [int(x, 16) for x in response_str.split()]
     print("response: %s" % response_str)
-    decode_target_data(response, NfcModulation.NMT_ISO14443A)
+    nfc_modulation = pn_to_nfc_modulation(pn532_modulation)
+    decode_target_data(response, nfc_modulation)
     # 0x32 RFConfiguration
     # Turn off the antenna power
     command_str = "32 01 00"
