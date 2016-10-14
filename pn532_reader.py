@@ -106,6 +106,9 @@ class Pn532Reader(object):
     DIRECT_TRANSMIT_INS = 0x00
     DIRECT_TRANSMIT_P1 = 0x00
     DIRECT_TRANSMIT_P2 = 0x00
+    # Direction
+    DIRECTION_HOST_READER = 0xD4
+    DIRECTION_READER_HOST = 0xD5
     # Direct Transmit status codes
     SW1_DT_SUCCESS = 0x61
     SW1_DT_ERROR = 0x63
@@ -215,6 +218,8 @@ class Pn532Reader(object):
         Args:
             apdu (list of int): the APDU payload to be sent.
         """
+        # prepends the host -> reader direction byte
+        payload = [Pn532Reader.DIRECTION_HOST_READER] + payload
         direct_transmit_lc = len(payload)
         # adds the pseudo ADPU header
         pseudo_apdu = PseudoApdu()

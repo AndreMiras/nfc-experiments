@@ -10,16 +10,20 @@ from pn532_reader import Pn532Reader
 
 
 def run(pn532_reader):
-    command_str = "D4 32 01 00"
+    # 0x32 RFConfiguration
+    # Turn off the antenna power
+    command_str = "32 01 00"
     response_str = pn532_reader.send_apdu_str(command_str)
     # print("response_str: %s" % response_str)
 
-    command_str = "D4 32 01 01"
+    # 0x32 RFConfiguration
+    # Turn on the antenna power
+    command_str = "32 01 01"
     response_str = pn532_reader.send_apdu_str(command_str)
     # print("response_str: %s" % response_str)
 
-    # 4A InListPassivTargets
-    command_str = "D4 4A 01 00"
+    # 0x4A InListPassivTargets
+    command_str = "4A 01 00"
     response_str = pn532_reader.send_apdu_str(command_str)
     response = [int(x, 16) for x in response_str.split()]
     print("response: %s" % response_str)
