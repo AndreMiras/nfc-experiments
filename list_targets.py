@@ -5,8 +5,19 @@ PN532 Command (InListPassiveTarget 212Kbps) = "D4 4A 01 01"
 """
 from __future__ import print_function
 from __future__ import unicode_literals
+from enum import Enum
 from smartcard.System import readers
 from pn532_reader import Pn532Reader, Pn532Modulation, NfcModulation
+
+
+class SelRes(Enum):
+    MIFARE_ULTRALIGHT = 0x00
+    MIFARE_1K = 0x08
+    MIFARE_MINI = 0x09
+    MIFARE_4K = 0x18
+    MIFARE_DESFIRE = 0x20
+    JCOP30 = 0x28
+    GEMPLUS_MPCOS = 0x98
 
 
 def decode_target_data_iso14443a(target_data):
@@ -14,7 +25,7 @@ def decode_target_data_iso14443a(target_data):
     sens_res = target_data[4:6]
     sens_res_str = "%02X %02X" % (
         sens_res[0], sens_res[1])
-    sel_res = target_data[6]
+    sel_res = SelRes(target_data[6])
     uid_length = target_data[7]
     uid = target_data[8:8+uid_length]
     uid_str = " ".join(["%02X" % x for x in uid])
