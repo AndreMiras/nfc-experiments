@@ -81,6 +81,7 @@ def decode_target_data(target_data, nfc_modulation):
         decode_target_data_iso14443b(target_data)
     else:
         raise NotImplementedError('')
+    return tags_found
 
 
 def pn_to_nfc_modulation(pn532_modulation):
@@ -97,7 +98,7 @@ def list_target(pn532_reader, pn532_modulation):
     # Turns on the antenna power
     # 0x32 RFConfiguration
     command_str = "32 01 01"
-    response_str = pn532_reader.send_apdu_str(command_str)
+    # response_str = pn532_reader.send_apdu_str(command_str)
     # Sets the Retry Time to one
     # 0x32 RFConfiguration
     command_str = "32 05 00 00 00"
@@ -113,11 +114,12 @@ def list_target(pn532_reader, pn532_modulation):
     response_str = pn532_reader.send_apdu_str(command_str)
     response = [int(x, 16) for x in response_str.split()]
     nfc_modulation = pn_to_nfc_modulation(pn532_modulation)
-    decode_target_data(response, nfc_modulation)
+    tags_found = decode_target_data(response, nfc_modulation)
     # Turns off the antenna power
     # 0x32 RFConfiguration
     command_str = "32 01 00"
-    response_str = pn532_reader.send_apdu_str(command_str)
+    # response_str = pn532_reader.send_apdu_str(command_str)
+    return tags_found
 
 
 def list_targets(pn532_reader):
